@@ -1,0 +1,8 @@
+{
+  "name": "dengsn/soundcloud",
+  "type": "library",
+  "description": "Soundcloud API wrapper for PHP",
+  "autoload": {
+    "psr-4": {"Soundcloud\\": "classes/"}
+  }
+}
