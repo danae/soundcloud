@@ -4,7 +4,7 @@
 
 ## Installation
 
-The Soundcloud library is best installed using Composer. The library is found as **dengsn/soundcloud** in de Packagist repository. Otherwise you can download the latest release or the dev-master branch as an archive.
+The Soundcloud library is best installed using Composer. The library is found as **dengsn/soundcloud** in the Packagist repository. Otherwise you can download the latest release or the dev-master branch as an archive.
 
 ## Usage
 
