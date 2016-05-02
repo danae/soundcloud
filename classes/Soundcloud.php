@@ -92,7 +92,7 @@ class Soundcloud
     $this->responseBody = substr($data,$info['header_size']);
     
     // Return the body or throw if not succesful
-    if (preg_match('/20[0-9]/',$this->responseStatus))
+    if (preg_match('/[2-3]0[0-9]/',$this->responseStatus))
       return json_decode($this->responseBody,true);
     else
       throw new SoundcloudException($this->responseStatus);
