@@ -1,7 +1,7 @@
 <?php
-namespace Soundcloud;
+namespace Soundcloud\Http;
 
-class SoundcloudException extends \Exception
+class RequestException extends \Exception
 {
   // Constructor
   public function __construct($message)

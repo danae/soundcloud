@@ -1,150 +1,131 @@
 <?php
 namespace Soundcloud;
 
+use Soundcloud\Http\Request;
+use Soundcloud\Http\RequestException;
+use Soundcloud\Http\Response;
+use Soundcloud\Http\Url;
+
 class Soundcloud
 {
-  // Request variables
+  // SoundCloud API location
+  const URL = 'https://api.soundcloud.com';
+  
+  // Variables
   private $clientId;
   private $redirectUri;
-  
-  // Response variables
-  private $responseHeaders;
-  private $responseBody;
-  private $responseStatus;
+  private $oauthToken = null;
   
   // Constructor
-  public function __construct($clientId, $redirectUri = null)
+  public function __construct($clientId, $redirectUri = '')
   {
     $this->clientId = $clientId;
     $this->redirectUri = $redirectUri;
   }
   
+  // Create a request object
+  private function createRequest($verb, $path, array $params = [])
+  {
+    // Create url
+    $url = new Url(self::URL . $path);
+    $url->withParam('client_id',$this->clientId);
+    if (!empty($this->redirectUri))
+      $url->withParam('redirect_uri',$this->redirectUri);
+    if (!empty($params))
+    $url->withParams($params);
+    
+    // Create request
+    $request = new Request($verb,$url);
+    $request->withHeader('Accept','application/json');
+    if ($this->oauthToken !== null)
+      $request->withHeader('Authorization','OAuth ' . $this->oauthToken);
+    if (!empty($body))
+      $request->withBody($body);
+    
+    // Return request
+    return $request;
+  }
+  
+  // Check the response for a vaild status
+  private function checkResponse(Response $response)
+  {
+    if (preg_match('/[2-3][0-9]{2}/', $response->getStatus()))
+      return $response->getBody();
+    else
+      throw new SoundcloudException("The request returned with HTTP status code " . $response->getStatus());
+  }
+  
   // Sends a GET request
   public function get($path, array $params = [])
   {
-    $url = $this->createUrl($path,$params);
-    return $this->request($url);
+    try
+    {
+      $response = $this->createRequest('GET',$path,$params)
+        ->request();
+      return $this->checkResponse($response);
+    }
+    catch (RequestException $ex)
+    {
+      throw new SoundcloudException($ex->getMessage);
+    }
   }
 
   // Sends a POST request
-  public function post($path, array $data = [])
+  public function post($path, array $body = [])
   {
-    $url = $this->createUrl($path);
-    return $this->request($url,[
-      CURLOPT_POST => true, 
-      CURLOPT_POSTFIELDS => $data
-    ]);
+    try
+    {
+      $response = $this->createRequest('POST',$path)
+        ->withBody($body)
+        ->request();
+      return $this->checkResponse($response);
+    }
+    catch (RequestException $ex)
+    {
+      throw new SoundcloudException($ex->getMessage);
+    }
   }
 
   // Sends a PUT request
-  public function put($path, $data)
+  public function put($path, array $body = [])
   {
-    $url = $this->createUrl($path);
-    return $this->request($url,[
-      CURLOPT_CUSTOMREQUEST => 'PUT', 
-      CURLOPT_POSTFIELDS => $data
-    ]);
+    try
+    {
+      $response = $this->createRequest('PUT',$path)
+        ->withBody($body)
+        ->request();
+      return $this->checkResponse($response);
+    }
+    catch (RequestException $ex)
+    {
+      throw new SoundcloudException($ex->getMessage);
+    }
   }
   
   // Sends a DELETE request
   public function delete($path)
   {
-    $url = $this->createUrl($path);
-    return $this->request($url,[
-      CURLOPT_CUSTOMREQUEST => 'DELETE'
-    ]);
+    try
+    {
+      $response = $this->createRequest('DELETE',$path)
+        ->request();
+      return $this->checkResponse($response);
+    }
+    catch (RequestException $ex)
+    {
+      throw new SoundcloudException($ex->getMessage);
+    }
   }
   
   // Sends a resolve request
   public function resolve($url)
   {
-    return $this->get('/resolve',[
-      'url' => $url
-    ]);
+    return $this->get('/resolve',['url' => $url]);
   }
   
   // Sends a oembed request
   public function oembed($url, array $params = [])
   {
-    return $this->get('/oembed',array_merge($params,[
-      'url' => $url
-    ]));
-  }
-  
-  // Sends a request using cUrl
-  protected function request($url, array $options = [])
-  {
-    // Perform a cUrl request
-    $curl = curl_init($url);
-    curl_setopt($curl,CURLOPT_HEADER,true);
-    curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
-    curl_setopt($curl,CURLOPT_USERAGENT,'Soundcloud-php');
-    curl_setopt_array($curl,$options);
-    
-    $data = curl_exec($curl);
-    $info = curl_getinfo($curl);
-    
-    curl_close($curl);
-
-    // Set the response fields
-    $this->responseStatus = $info['http_code'];
-    $this->responseHeaders = self::headers(substr($data,0,$info['header_size']));
-    $this->responseBody = substr($data,$info['header_size']);
-    
-    // Return the body or throw if not succesful
-    if (preg_match('/[2-3]0[0-9]/',$this->responseStatus))
-      return json_decode($this->responseBody,true);
-    else
-      throw new SoundcloudException($this->responseStatus);
-  }
-  
-  // Returns the response headers
-  public function getHeaders()
-  {
-    return $this->responseHeaders;
-  }
-  
-  // Returns the response body
-  public function getBody()
-  {
-    return $this->responseBody;
-  }
-  
-  // Returns the response status
-  public function getStatus()
-  {
-    return $this->responseStatus;
-  }
-  
-  // Creates an formatted URL
-  private function createUrl($path, array $params = [])
-  {
-    $url = "http://api.soundcloud.com" . $path;
-    
-    $allParams = $params;
-    $allParams['client_id'] = $this->clientId;
-    if ($this->redirectUri !== null)
-      $allParams['redirect_uri'] = $this->redirectUri;
-
-    $url .= '?' . http_build_query($allParams);
-    return $url;
-  }
-  
-  // Parses HTTP headers
-  private static function headers($headers)
-  {
-    $unparsedHeaders = explode("\n",trim($headers));
-    $parsedHeaders = [];
-
-    foreach ($unparsedHeaders as $header)
-    {
-      if (!preg_match('/\:\s/',$header))
-        continue;
-
-      list($key,$value) = explode(': ',$header,2);
-      $parsedHeaders[$key] = trim($value);
-    }
-
-    return $parsedHeaders;
+    return $this->get('/oembed',array_merge($params,['url' => $url]));
   }
 }
