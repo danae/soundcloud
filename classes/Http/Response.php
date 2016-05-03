@@ -7,13 +7,21 @@ class Response implements HttpInterface
   private $headers;
   private $body;
   private $status;
+  private $request;
    
   // Constructor
-  public function __construct($status, $headers, $body)
+  public function __construct($status, $headers, $body, Request $request = null)
   {
     $this->status = $status;
     $this->headers = $headers;
     $this->body = $body;
+    $this->request = $request;
+  }
+  
+  // Gets the header
+  public function getStatus()
+  {
+    return $this->status;
   }
   
   // Gets headers
@@ -52,9 +60,9 @@ class Response implements HttpInterface
     return $this->body;
   }
   
-  // Gets the header
-  public function getStatus()
+  // Gets the request
+  public function getRequest()
   {
-    return $this->status;
+    return $this->request;
   }
 }

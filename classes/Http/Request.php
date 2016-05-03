@@ -83,6 +83,16 @@ class Request implements HttpWriteInterface
     $this->body = $body;
     return $this;
   }
+  public function withBodyParam($name, $value)
+  {
+    $this->body[$name] = $value;
+    return $this;
+  }
+  public function withBodyParams(array $params)
+  {
+    $this->body = array_merge($this->body,$params);
+    return $this;
+  }
   
   // Execute the request
   public function request($followRedirects = true)
@@ -120,7 +130,8 @@ class Request implements HttpWriteInterface
     return new Response(
       $info['http_code'],
       self::explodeHeaders(substr($response,0,$info['header_size']),true),
-      substr($response,$info['header_size'])
+      substr($response,$info['header_size']),
+      $this
     );
   }
   

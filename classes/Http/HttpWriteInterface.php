@@ -9,4 +9,6 @@ interface HttpWriteInterface extends HttpInterface
   
   // Sets body
   public function withBody($body);
+  public function withBodyParam($name, $value);
+  public function withBodyParams(array $params);
 }
