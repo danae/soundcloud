@@ -172,7 +172,8 @@ class Soundcloud
       ->withParam('redirect_uri',$this->redirectUri)
       ->withParam('response_type','code')
       ->withParam('scope','non-expiring')
-      ->withParam('display','popup');
+      ->withParam('display','popup')
+      ->build();
   }
   
   // Creates an url
