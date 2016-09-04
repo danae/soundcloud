@@ -83,14 +83,14 @@ class Request implements HttpWriteInterface
     $this->body = $body;
     return $this;
   }
-  public function withBodyParam($name, $value)
-  {
-    $this->body[$name] = $value;
-    return $this;
-  }
   public function withBodyParams(array $params)
   {
     $this->body = array_merge($this->body,$params);
+    return $this;
+  }
+  public function withBodyParam($name, $value)
+  {
+    $this->body[$name] = $value;
     return $this;
   }
   

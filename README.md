@@ -20,16 +20,24 @@ The following code fragment explains the basic usage of the Soundcloud library. 
     try
     {
       // Create a new instance of the API
-      $sc = new Soundcloud($client_id, $client_secret, $redirect_url);
+      $sc = new Soundcloud($client_id);
+      
+      // Set the client secret
+      $sc->withClientSecret($client_secret);
+      
+      // Set the redirect URI
+      $sc->withRedirectURI($redirect_uri);
       
       // Set the authorization code
-      $sc->withAuthorizationCode($code);
+      $sc->withAuthCode($code);
       
       // Returns an array containing the tracks
       $sc->get('/me/tracks'); 
       
       // The previous lines can also be written in one line as follows
       (new Soundcloud($client_id, $client_secret, $redirect_url))
+        ->withClientSecret($client_secret)
+        ->withRedirectURI($redirect_url)
         ->withAuthorizationCode($code)
         ->get('/me>/tracks');
     }
@@ -44,9 +52,11 @@ This paragraph describes all functions of the public API. Underlying classes and
 
 ### Instantination and authorization
 
-To create a new `Soundcloud` object, you need to specify your `client_id` and optionally your `client_secret` and `request_uri`. If you already have a useable OAuth access token, you can supply that as well.
+To create a new `Soundcloud` object, you need to specify your `client_id` and optionally your `client_secret` and `redirect_uri`.
 
-    $soundcloud = new Soundcloud($clientID, $clientSecret = null, $redirectUri = null, $accessToken = null);
+    $soundcloud = new Soundcloud($client_id);
+    $soundcloud->withClientSecret($client_secret);
+    $soundcloud->withRedirectURI($redirect_url);
     
 To link your users to the connection page, you can use the `authorizeUrl()` function.
 
@@ -54,11 +64,11 @@ To link your users to the connection page, you can use the `authorizeUrl()` func
     
 If you received the access code from the connection page, you can use that tho authorize the API and access personal resources such as `/me ` or private sets. The function returns the `Soundcloud` object and throws a `SoundcloudException` if the request failed.
 
-    $soundcloud->withAuthorizationCode($code);
+    $soundcloud->withAuthCode($code);
     
 You can also create an access token by entering the user's credentials directly. The function returns the `Soundcloud` object and throws a `SoundcloudException` if the request failed.
 
-    $soundcloud->withAuthorizationCredentials($username, $password);
+    $soundcloud->withAuthCredentials($username, $password);
 
 This authorization method is not recommended by [SoundCloud](https://developers.soundcloud.com/docs/api/guide#authentication) and is prohibited is using other user's accounts:
 > Our Terms of Service specify that you must use the Connect with SoundCloud screen unless you have made a separate arrangement with us.

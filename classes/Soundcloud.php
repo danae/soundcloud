@@ -14,24 +14,47 @@ class Soundcloud
   
   // Variables
   private $clientId;
-  private $clientSecret;
-  private $redirectUri;
-  private $accessToken;
+  private $clientSecret = null;
+  private $redirectUri = null;
+  private $accessToken = null;
   
   // Constructor
-  public function __construct($clientId, $clientSecret = null, $redirectUri = null, $accessToken = null)
+  public function __construct($clientId)
   {
     $this->clientId = $clientId;
+  }
+  
+  // Sets the client id
+  public function withClientId($clientId)
+  {
+    $this->clientId = $clientId;
+    return $this;
+  }
+  
+  // Sets the client secret
+  public function withClientSecret($clientSecret)
+  {
     $this->clientSecret = $clientSecret;
+    return $this;
+  }
+
+  // Sets the redirect URI
+  public function withRedirectUri($redirectUri)
+  {
     $this->redirectUri = $redirectUri;
-    $this->accessToken = $accessToken;
+    return $this;
   }
   
   // Sets the access token based on a /connect code
-  public function withAuthorizationCode($code)
+  public function withAuthCode($code)
   {
     try
     {
+     if ($this->clientSecret == null)
+        throw new \InvalidArgumentException('You must set client_secret first');
+      if ($this->redirectUri == null)
+        throw new \InvalidArgumentException('You must set redirect_uri first');
+      
       $url = new Url(self::URL . '/oauth2/token');
       
       $response = $this->createRequest('POST',$url)
@@ -52,10 +75,15 @@ class Soundcloud
   }
   
   // Sets the access token based on user credentials
-  public function withAuthorizationCredentials($username, $password)
+  public function withAuthCredentials($username, $password)
   {
     try
     {
+      if ($this->clientSecret == null)
+        throw new \InvalidArgumentException('You must set client_secret first');
+      if ($this->redirectUri == null)
+        throw new \InvalidArgumentException('You must set redirect_uri first');
+      
       $url = new Url(self::URL . '/oauth2/token');
       
       $response = $this->createRequest('POST',$url)
@@ -85,8 +113,6 @@ class Soundcloud
       
       $response = $this->createRequest('GET',$url)
         ->request();
-      
-      var_dump($response);
       
       return $this->validate($response)->getBody();
     }
@@ -181,9 +207,9 @@ class Soundcloud
   {
     $url = new Url(self::URL . $path);
     $url->withParam('client_id',$this->clientId);
-    if (!empty($this->redirectUri))
+    if ($this->redirectUri != null)
       $url->withParam('redirect_uri',$this->redirectUri);
-    if (!empty($this->accessToken))
+    if ($this->accessToken != null)
       $url->withParam('oauth_token',$this->accessToken);
     if (!empty($params))
       $url->withParams($params);
@@ -203,7 +229,9 @@ class Soundcloud
   // Check the response for a vaild status
   private function validate(Response $response)
   {
-    if (!preg_match('/[2-3][0-9]{2}/', $response->getStatus()))
+    if ($response->getStatus() == 401)
+      throw new SoundcloudException("You must authorize your application first",$response);
+    elseif (!preg_match('/[2-3][0-9]{2}/', $response->getStatus()))
       throw new SoundcloudException("The request returned with HTTP status code " . $response->getStatus(),$response);
     else
       return $response;
