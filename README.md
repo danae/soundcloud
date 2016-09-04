@@ -26,7 +26,7 @@ The following code fragment explains the basic usage of the Soundcloud library. 
       $sc->withClientSecret($client_secret);
       
       // Set the redirect URI
-      $sc->withRedirectURI($redirect_uri);
+      $sc->withRedirectUri($redirect_uri);
       
       // Set the authorization code
       $sc->withAuthCode($code);
@@ -56,7 +56,7 @@ To create a new `Soundcloud` object, you need to specify your `client_id` and op
 
     $soundcloud = new Soundcloud($client_id);
     $soundcloud->withClientSecret($client_secret);
-    $soundcloud->withRedirectURI($redirect_url);
+    $soundcloud->withRedirectUri($redirect_url);
     
 To link your users to the connection page, you can use the `authorizeUrl()` function.
 
