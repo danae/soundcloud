@@ -1,8 +1,8 @@
-# purplelum/Soundcloud
+# Soundcloud
 
-**purplelum/Soundcloud** is a SoundCloud® API wrapper for PHP 5.6 or higher. 
+**dengsn/Soundcloud** is a SoundCloud® API wrapper for PHP 5.6 or higher. 
 
-[![GitHub release](https://img.shields.io/github/release/purplelum/Soundcloud.svg)](https://github.com/purplelum/Soundcloud/releases) [![Github All Releases](https://img.shields.io/github/downloads/purplelum/Soundcloud/total.svg?maxAge=2592000)](https://github.com/purplelum/Soundcloud/releases) 
+[![GitHub release](https://img.shields.io/github/release/dengsn/Soundcloud.svg)](https://github.com/dengsn/Soundcloud/releases) [![Github All Releases](https://img.shields.io/github/downloads/dengsn/Soundcloud/total.svg?maxAge=2592000)](https://github.com/dengsn/Soundcloud/releases) 
 
 ## Installation
 
