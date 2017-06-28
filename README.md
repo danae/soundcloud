@@ -1,6 +1,4 @@
-# Soundcloud
-
-**dengsn/soundcloud** is a SoundCloud® API wrapper for PHP 5.6 or higher. 
+**soundcloud-php** is a SoundCloud® API wrapper for PHP 5.6 or higher. 
 
 ## Installation
 
