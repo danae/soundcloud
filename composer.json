@@ -2,7 +2,11 @@
   "name": "dengsn/soundcloud",
   "type": "library",
   "description": "Soundcloud API wrapper for PHP",
+  "require": {
+    "php": "^7.0",
+    "guzzlehttp/guzzle": "^6.0"
+  },
   "autoload": {
-    "psr-4": {"Soundcloud\\": "classes/"}
+    "psr-4": {"Soundcloud\\": "src/"}
   }
 }
